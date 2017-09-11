@@ -10,6 +10,16 @@ class yumrepos::varnish41 (
   $varnish41_exclude = $yumrepos::params::varnish41_exclude,
 ) inherits yumrepos::params {
 
+  if ! defined(File['/etc/pki/rpm-gpg/RPM-GPG-KEY-VARNISH-PACKAGECLOUD']) {
+    file { '/etc/pki/rpm-gpg/RPM-GPG-KEY-VARNISH-PACKAGECLOUD':
+      ensure => present,
+      owner  => root,
+      group  => root,
+      mode   => '0644',
+      source => 'puppet:///modules/yumrepos/etc/pki/rpm-gpg/RPM-GPG-KEY-VARNISH-PACKAGECLOUD',
+    }
+  }
+
   yumrepo { 'varnish41':
     descr       => 'Varnish 4.1',
     baseurl     => $varnish41_url,
@@ -17,6 +27,7 @@ class yumrepos::varnish41 (
     includepkgs => $varnish41_includepkgs,
     exclude     => $varnish41_exclude,
     gpgcheck    => $varnish41_gpgcheck,
-    gpgkey      => 'https://packagecloud.io/varnishcache/varnish41/gpgkey', 
+    gpgkey      => 'file:///etc/pki/rpm-gpg/RPM-GPG-KEY-VARNISH-PACKAGECLOUD',
+    require     => File['/etc/pki/rpm-gpg/RPM-GPG-KEY-VARNISH-PACKAGECLOUD'],
   }
 }
